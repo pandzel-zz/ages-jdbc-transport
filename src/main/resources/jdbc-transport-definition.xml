@@ -1,0 +1,9 @@
+<transport name="JdbcTransport" label="${com.esri.geoevent.transport.jdbc-transport.TRANSPORT_IN_LABEL}" contact="yourname@yourcompany.com" version="10.6.1" type="inbound">
+	<description>${com.esri.geoevent.transport.jdbc-transport.TRANSPORT_IN_DESC}</description>
+	<propertyDefinitions>
+		<propertyDefinition propertyName="eventRate" label="${com.esri.geoevent.transport.jdbc-transport.TRANSPORT_IN_EVENT_RATE_LBL}"
+			description="${com.esri.geoevent.transport.jdbc-transport.TRANSPORT_IN_EVENT_RATE_DESC}"
+			propertyType="Integer" defaultValue="1" mandatory="true" readOnly="false">
+		</propertyDefinition>
+	</propertyDefinitions>
+</transport>
