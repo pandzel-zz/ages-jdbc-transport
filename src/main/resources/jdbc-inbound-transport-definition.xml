@@ -1,6 +1,16 @@
 <transport name="JDBC" label="${com.esri.geoevent.transport.jdbc-transport.JDBC_LABEL}" contact="yourname@yourcompany.com" version="${project.version}" domain="sample.transport.inbound" type="inbound">
 	<description>${com.esri.geoevent.transport.jdbc-transport.JDBC_DESC}</description>
 	<propertyDefinitions>
+		<propertyDefinition propertyName="databaseDriverClass" label="${com.esri.geoevent.transport.jdbc-transport.JDBC_DATABASE_LABEL}"
+			description="${com.esri.geoevent.transport.jdbc-transport.JDBC_DATABASE_DESC}"
+			propertyType="String" mandatory="true" readOnly="false">
+      <allowedValues>
+        <value value="oracle.jdbc.driver.OracleDriver" label="Oracle"/>
+        <value value="com.microsoft.sqlserver.jdbc.SQLServerDriver" label="SQL Server"/>
+        <value value="org.postgresql.Driver" label="Postgres"/>
+        <value value="com.mysql.jdbc.Driver" label="MySql"/>
+      </allowedValues>
+		</propertyDefinition>
 		<propertyDefinition propertyName="connectionUrl" label="${com.esri.geoevent.transport.jdbc-transport.JDBC_URL_LABEL}"
 			description="${com.esri.geoevent.transport.jdbc-transport.JDBC_URL_DESC}"
 			propertyType="String" mandatory="true" readOnly="false">
