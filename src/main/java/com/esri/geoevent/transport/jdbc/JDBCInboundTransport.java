@@ -70,8 +70,6 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
 
 	public void run()
 	{
-    // TODO: provide run() implementation
-    /*
 		try
 		{
 			applyProperties();
@@ -80,16 +78,13 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
 			{
 				try
 				{
-					for( int i = 0; i < eventSize; i++ )
-						byteBuffer.put( (byte) i );
-					byteBuffer.flip();
-					byteListener.receive(byteBuffer, channelId);
-					byteBuffer.compact();
+          // TODO: provide run() implementation
+					// byteListener.receive(byteBuffer, channelId);
+          Thread.sleep(eventRate);
 				}
 				catch (BufferOverflowException boe)
 				{
 				  LOGGER.error("BUFFER_OVERFLOW_ERROR", boe);
-					byteBuffer.clear();
 				}
 				catch (Exception e)
 				{
@@ -103,14 +98,10 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
 		  LOGGER.error(ex.getMessage(), ex);
 			setRunningState(RunningState.ERROR);
 		}
-    */
 	}
 
-	@SuppressWarnings("incomplete-switch")
   public void start() throws RunningException
 	{
-    // TODO: provide start() implementation
-    /*
     switch (getRunningState())
 		{
 		case STARTING:
@@ -121,6 +112,5 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
 		setRunningState(RunningState.STARTING);
 		thread = new Thread(this);
 		thread.start();
-    */
 	}
 }
