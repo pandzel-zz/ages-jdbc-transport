@@ -23,6 +23,10 @@
 			description="${com.esri.geoevent.transport.jdbc-transport.JDBC_PASSWORD_DESC}"
 			propertyType="Password" mandatory="true" readOnly="false">
 		</propertyDefinition>
+		<propertyDefinition propertyName="statement" label="${com.esri.geoevent.transport.jdbc-transport.JDBC_STATEMENT_LABEL}"
+			description="${com.esri.geoevent.transport.jdbc-transport.JDBC_STATEMENT_DESC}"
+			propertyType="String" mandatory="true" readOnly="false">
+		</propertyDefinition>
 		<propertyDefinition propertyName="eventRate" label="${com.esri.geoevent.transport.jdbc-transport.JDBC_EVENT_RATE_LBL}"
 			description="${com.esri.geoevent.transport.jdbc-transport.JDBC_EVENT_RATE_DESC}"
 			propertyType="Integer" defaultValue="1" mandatory="true" readOnly="false">

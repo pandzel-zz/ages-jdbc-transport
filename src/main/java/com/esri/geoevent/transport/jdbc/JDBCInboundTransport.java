@@ -21,35 +21,40 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
   private static final BundleLogger LOGGER = BundleLoggerFactory.getLogger(JDBCInboundTransport.class);
   
 	private int eventRate = 1;
+  private String databaseDriverClass;
 	private Thread thread = null;
 	private String channelId = "1";
+  private String connectionUrl;
+  private String userName;
+  private String password;
+  private String statement;
 
-	public JDBCInboundTransport(TransportDefinition definition) throws ComponentException
-	{
+	public JDBCInboundTransport(TransportDefinition definition) throws ComponentException	{
 		super(definition);
 	}
 
 	public void applyProperties() throws Exception {
-    // TODO: provide applyProperties() implementation
-    /*
-		if (getProperty("eventSize").isValid())
-		{
-			int value = (Integer) getProperty("eventSize").getValue();
-			if( value > 0 && value != eventSize )
-			{
-				eventSize = value;
-				byteBuffer = ByteBuffer.allocate(eventSize);
-			}
+		if (getProperty("databaseDriverClass").isValid()) {
+			databaseDriverClass = (String) getProperty("databaseDriverClass").getValue();
 		}
-		if (getProperty("eventRate").isValid())
-		{
+		if (getProperty("connectionUrl").isValid()) {
+			connectionUrl = (String) getProperty("connectionUrl").getValue();
+		}
+		if (getProperty("userName").isValid()) {
+			userName = (String) getProperty("userName").getValue();
+		}
+		if (getProperty("password").isValid()) {
+			password = (String) getProperty("password").getValue();
+		}
+		if (getProperty("statement").isValid()) {
+			statement = (String) getProperty("statement").getValue();
+		}
+		if (getProperty("eventRate").isValid()) {
 			int value = (Integer) getProperty("eventRate").getValue();
-			if( value > 0 && value != eventRate )
-			{
+			if( value > 0 && value != eventRate ) {
 				eventRate = value;
 			}
 		}
-    */
 	}
 
 	public void run()
