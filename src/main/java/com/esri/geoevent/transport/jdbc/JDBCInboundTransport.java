@@ -20,14 +20,19 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
    */
   private static final BundleLogger LOGGER = BundleLoggerFactory.getLogger(JDBCInboundTransport.class);
   
-	private int eventRate = 1;
+  // properties
   private String databaseDriverClass;
-	private Thread thread = null;
-	private String channelId = "1";
   private String connectionUrl;
   private String userName;
   private String password;
   private String statement;
+  private String xFieldName;
+  private String yFieldName;
+	private int eventRate = 1;
+  
+  // instance variables
+	private Thread thread = null;
+	private String channelId = "1";
 
 	public JDBCInboundTransport(TransportDefinition definition) throws ComponentException	{
 		super(definition);
@@ -48,6 +53,12 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
 		}
 		if (getProperty("statement").isValid()) {
 			statement = (String) getProperty("statement").getValue();
+		}
+		if (getProperty("xFieldName").isValid()) {
+			xFieldName = (String) getProperty("xFieldName").getValue();
+		}
+		if (getProperty("yFieldName").isValid()) {
+			yFieldName = (String) getProperty("yFieldName").getValue();
 		}
 		if (getProperty("eventRate").isValid()) {
 			int value = (Integer) getProperty("eventRate").getValue();

@@ -27,6 +27,14 @@
 			description="${com.esri.geoevent.transport.jdbc-transport.JDBC_STATEMENT_DESC}"
 			propertyType="String" mandatory="true" readOnly="false">
 		</propertyDefinition>
+		<propertyDefinition propertyName="xFieldName" label="${com.esri.geoevent.transport.jdbc-transport.JDBC_XFLD_LABEL}"
+			description="${com.esri.geoevent.transport.jdbc-transport.JDBC_XFLD_DESC}"
+			propertyType="String" mandatory="true" readOnly="false">
+		</propertyDefinition>
+		<propertyDefinition propertyName="yFieldName" label="${com.esri.geoevent.transport.jdbc-transport.JDBC_YFLD_LABEL}"
+			description="${com.esri.geoevent.transport.jdbc-transport.JDBC_YFLD_DESC}"
+			propertyType="String" mandatory="true" readOnly="false">
+		</propertyDefinition>
 		<propertyDefinition propertyName="eventRate" label="${com.esri.geoevent.transport.jdbc-transport.JDBC_EVENT_RATE_LBL}"
 			description="${com.esri.geoevent.transport.jdbc-transport.JDBC_EVENT_RATE_DESC}"
 			propertyType="Integer" defaultValue="1" mandatory="true" readOnly="false">
