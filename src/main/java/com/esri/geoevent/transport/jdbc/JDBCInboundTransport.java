@@ -10,6 +10,9 @@ import com.esri.ges.framework.i18n.BundleLogger;
 import com.esri.ges.framework.i18n.BundleLoggerFactory;
 import com.esri.ges.transport.InboundTransportBase;
 import com.esri.ges.transport.TransportDefinition;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class JDBCInboundTransport extends InboundTransportBase implements Runnable
 {
@@ -38,7 +41,66 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
 		super(definition);
 	}
 
-	public void applyProperties() throws Exception {
+  @Override
+	public void run()
+	{
+    Connection conn = null;
+    
+		try	{
+      
+			applyProperties();
+      Class.forName(databaseDriverClass);
+      conn = DriverManager.getConnection(connectionUrl, userName, password);
+      
+			setRunningState(RunningState.STARTED);
+			while( getRunningState() == RunningState.STARTED )
+			{
+				try
+				{
+          // TODO: provide run() implementation
+					// byteListener.receive(byteBuffer, channelId);
+          Thread.sleep(eventRate);
+				}
+				catch (BufferOverflowException boe)
+				{
+				  LOGGER.error("BUFFER_OVERFLOW_ERROR", boe);
+				}
+				catch (Exception e)
+				{
+				  LOGGER.error("UNEXPECTED_ERROR", e);
+					stop();
+				}
+			}
+		}
+		catch (Throwable ex) {
+		  LOGGER.error(ex.getMessage(), ex);
+			setRunningState(RunningState.ERROR);
+		}
+    finally {
+      if (conn!=null) {
+        try {
+          conn.close();
+        } catch (SQLException ex) {}
+      }
+    }
+	}
+
+  @Override
+  public void start() throws RunningException
+	{
+    switch (getRunningState())
+		{
+		case STARTING:
+		case STARTED:
+		case STOPPING:
+			return;
+		}
+		setRunningState(RunningState.STARTING);
+		thread = new Thread(this);
+		thread.start();
+	}
+
+	private void applyProperties() throws Exception {
 		if (getProperty("databaseDriverClass").isValid()) {
 			databaseDriverClass = (String) getProperty("databaseDriverClass").getValue();
 		}
@@ -66,51 +128,5 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
 				eventRate = value;
 			}
 		}
-	}
-
-	public void run()
-	{
-		try
-		{
-			applyProperties();
-			setRunningState(RunningState.STARTED);
-			while( getRunningState() == RunningState.STARTED )
-			{
-				try
-				{
-          // TODO: provide run() implementation
-					// byteListener.receive(byteBuffer, channelId);
-          Thread.sleep(eventRate);
-				}
-				catch (BufferOverflowException boe)
-				{
-				  LOGGER.error("BUFFER_OVERFLOW_ERROR", boe);
-				}
-				catch (Exception e)
-				{
-				  LOGGER.error("UNEXPECTED_ERROR", e);
-					stop();
-				}
-			}
-		}
-		catch (Throwable ex)
-		{
-		  LOGGER.error(ex.getMessage(), ex);
-			setRunningState(RunningState.ERROR);
-		}
-	}
-
-  public void start() throws RunningException
-	{
-    switch (getRunningState())
-		{
-		case STARTING:
-		case STARTED:
-		case STOPPING:
-			return;
-		}
-		setRunningState(RunningState.STARTING);
-		thread = new Thread(this);
-		thread.start();
 	}
 }
