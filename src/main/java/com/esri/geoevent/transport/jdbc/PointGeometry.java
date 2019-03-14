@@ -1,4 +1,4 @@
-package com.esri.geoevent.transport.jdbc.geojson;
+package com.esri.geoevent.transport.jdbc;
 
 /**
  * Point geometry.

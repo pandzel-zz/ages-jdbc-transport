@@ -1,8 +1,5 @@
 package com.esri.geoevent.transport.jdbc;
 
-import com.esri.geoevent.transport.jdbc.geojson.Feature;
-import com.esri.geoevent.transport.jdbc.geojson.FeatureCollection;
-import com.esri.geoevent.transport.jdbc.geojson.PointGeometry;
 import java.nio.BufferOverflowException;
 
 import com.esri.ges.core.component.ComponentException;
@@ -12,6 +9,9 @@ import com.esri.ges.framework.i18n.BundleLogger;
 import com.esri.ges.framework.i18n.BundleLoggerFactory;
 import com.esri.ges.transport.InboundTransportBase;
 import com.esri.ges.transport.TransportDefinition;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.ByteBuffer;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -29,6 +29,11 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
    * See {@link BundleLogger} for more info.
    */
   private static final BundleLogger LOGGER = BundleLoggerFactory.getLogger(JDBCInboundTransport.class);
+  private static final ObjectMapper MAPPER = new ObjectMapper();
+  
+  static {
+    MAPPER.setSerializationInclusion(Include.NON_NULL);
+  }
   
   // properties
   private String databaseDriverClass;
@@ -62,9 +67,16 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
 			setRunningState(RunningState.STARTED);
 			while( getRunningState() == RunningState.STARTED ) {
 				try {
-          // TODO: provide run() implementation
-					// byteListener.receive(byteBuffer, channelId);
-          queryAndProcess(conn);
+          
+          FeatureCollection fc = query(conn);
+          byte [] bytes = MAPPER.writeValueAsBytes(fc);
+          
+          ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
+          byteBuffer.put(bytes);
+          byteBuffer.flip();
+          
+          byteListener.receive(byteBuffer, channelId);
+          
           Thread.sleep(eventRate);
 				}
 				catch (BufferOverflowException boe) {
@@ -92,7 +104,7 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
     }
 	}
   
-  private void queryAndProcess(Connection conn) throws SQLException {
+  private FeatureCollection query(Connection conn) throws SQLException {
     PreparedStatement stm = null;
     ResultSet rs = null;
     
@@ -113,6 +125,7 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
       }
       
       FeatureCollection fc = new FeatureCollection(features);
+      return fc;
     } finally {
       safeClose(rs);
       safeClose(stm);
