@@ -1,7 +1,9 @@
 package com.esri.geoevent.transport.jdbc;
 
+import com.esri.geoevent.transport.jdbc.geojson.Feature;
+import com.esri.geoevent.transport.jdbc.geojson.FeatureCollection;
+import com.esri.geoevent.transport.jdbc.geojson.PointGeometry;
 import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
 
 import com.esri.ges.core.component.ComponentException;
 import com.esri.ges.core.component.RunningException;
@@ -12,7 +14,12 @@ import com.esri.ges.transport.InboundTransportBase;
 import com.esri.ges.transport.TransportDefinition;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 public class JDBCInboundTransport extends InboundTransportBase implements Runnable
 {
@@ -53,20 +60,20 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
       conn = DriverManager.getConnection(connectionUrl, userName, password);
       
 			setRunningState(RunningState.STARTED);
-			while( getRunningState() == RunningState.STARTED )
-			{
-				try
-				{
+			while( getRunningState() == RunningState.STARTED ) {
+				try {
           // TODO: provide run() implementation
 					// byteListener.receive(byteBuffer, channelId);
+          queryAndProcess(conn);
           Thread.sleep(eventRate);
 				}
-				catch (BufferOverflowException boe)
-				{
+				catch (BufferOverflowException boe) {
 				  LOGGER.error("BUFFER_OVERFLOW_ERROR", boe);
 				}
-				catch (Exception e)
-				{
+        catch (SQLException ex) {
+				  LOGGER.error("SQL_ERROR", ex);
+        }
+				catch (Exception e) {
 				  LOGGER.error("UNEXPECTED_ERROR", e);
 					stop();
 				}
@@ -84,6 +91,53 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
       }
     }
 	}
+  
+  private void queryAndProcess(Connection conn) throws SQLException {
+    PreparedStatement stm = null;
+    ResultSet rs = null;
+    
+    try {
+      stm = conn.prepareStatement(statement);
+      rs = stm.executeQuery();
+      ResultSetMetaData metaData = rs.getMetaData();
+
+      ArrayList<Feature> features = new ArrayList<>();
+      while (rs.next()) {
+        double x = rs.getDouble(xFieldName);
+        double y = rs.getDouble(yFieldName);
+        
+        PointGeometry geometry = new PointGeometry(x, y);
+        Feature feature = new Feature(geometry, null);
+        
+        features.add(feature);
+      }
+      
+      FeatureCollection fc = new FeatureCollection(features);
+    } finally {
+      safeClose(rs);
+      safeClose(stm);
+    }
+  }
+  
+  private void safeClose(Statement stm) {
+    if (stm!=null) {
+      try {
+        stm.close();
+      } catch (SQLException ex) {
+        // IGNORE
+      }
+    }
+  }
+  
+  private void safeClose(ResultSet rs) {
+    if (rs!=null) {
+      try {
+        rs.close();
+      } catch (SQLException ex) {
+        // IGNORE
+      }
+    }
+  }
 
   @Override
   public void start() throws RunningException
