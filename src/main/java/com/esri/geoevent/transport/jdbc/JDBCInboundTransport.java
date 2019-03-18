@@ -5,6 +5,7 @@ import java.nio.BufferOverflowException;
 import com.esri.ges.core.component.ComponentException;
 import com.esri.ges.core.component.RunningException;
 import com.esri.ges.core.component.RunningState;
+import com.esri.ges.core.security.GeoEventServerCryptoService;
 import com.esri.ges.framework.i18n.BundleLogger;
 import com.esri.ges.framework.i18n.BundleLoggerFactory;
 import com.esri.ges.transport.InboundTransportBase;
@@ -20,6 +21,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import org.apache.commons.codec.binary.Base64;
 
 public class JDBCInboundTransport extends InboundTransportBase implements Runnable
 {
@@ -35,6 +37,8 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
     MAPPER.setSerializationInclusion(Include.NON_NULL);
   }
   
+  private final GeoEventServerCryptoService cryptoService;
+  
   // properties
   private String databaseDriverClass;
   private String connectionUrl;
@@ -49,8 +53,9 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
 	private Thread thread = null;
 	private String channelId = "1";
 
-	public JDBCInboundTransport(TransportDefinition definition) throws ComponentException	{
+	public JDBCInboundTransport(GeoEventServerCryptoService cryptoService, TransportDefinition definition) throws ComponentException	{
 		super(definition);
+    this.cryptoService = cryptoService;
 	}
 
   @Override
@@ -61,8 +66,9 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
 		try	{
       
 			applyProperties();
+      
       Class.forName(databaseDriverClass);
-      conn = DriverManager.getConnection(connectionUrl, userName, password);
+      conn = DriverManager.getConnection(connectionUrl, userName, cryptoService.decrypt(password));
       
 			setRunningState(RunningState.STARTED);
 			while( getRunningState() == RunningState.STARTED ) {
@@ -90,6 +96,7 @@ public class JDBCInboundTransport extends InboundTransportBase implements Runnab
 					stop();
 				}
 			}
+      setRunningState(RunningState.STOPPED);
 		}
 		catch (Throwable ex) {
 		  LOGGER.error(ex.getMessage(), ex);

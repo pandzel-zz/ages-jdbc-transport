@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" >
+	<reference id="cryptoService" interface="com.esri.ges.core.security.GeoEventServerCryptoService" />
 	<bean id="JDBCTransportServiceBean" class="com.esri.geoevent.transport.jdbc.JDBCInboundTransportService" activation="eager">
 		<property name="bundleContext" ref="blueprintBundleContext"/>
+    <property name="cryptoService" ref="cryptoService"/>
 	</bean>
 	<service id="JDBCTransportService" ref="JDBCTransportServiceBean" interface="com.esri.ges.transport.TransportService"/>
 </blueprint>

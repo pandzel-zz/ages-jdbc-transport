@@ -56,6 +56,7 @@
             <Bundle-Version>${project.version}</Bundle-Version>
             <Export-Package/>
             <Private-Package>com.esri.geoevent.transport.jdbc</Private-Package>
+            <Import-Package>*,org.postgresql</Import-Package>
           </instructions>
         </configuration>
       </plugin>
